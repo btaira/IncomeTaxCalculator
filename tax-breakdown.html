@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2025 CA Tax Breakdown</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg:       #0d1117;
+    --surface:  #161b22;
+    --surface2: #1c2333;
+    --border:   #30363d;
+    --border2:  #21262d;
+    --text:     #e6edf3;
+    --text2:    #8b949e;
+    --text3:    #484f58;
+    --green:    #3fb950;
+    --orange:   #f0883e;
+    --blue:     #58a6ff;
+    --purple:   #bc8cff;
+    --pink:     #ff7eb3;
+    --red:      #f85149;
+  }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+  .container { max-width: 700px; margin: 0 auto; padding: 28px 16px 60px; }
+
+  /* Typography */
+  .section-title { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 12px; }
+  .label { font-size: 11px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.1em; }
+  .muted { color: var(--text2); }
+  .dimmed { color: var(--text3); }
+
+  /* Card */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 18px;
+  }
+
+  /* Stat grid */
+  .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent, var(--text));
+    border-radius: 12px;
+    padding: 16px;
+  }
+  .stat-card .stat-value { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
+  .stat-card .stat-sub { font-size: 12px; color: var(--text2); margin-top: 4px; }
+
+  /* Input */
+  .income-input-wrap {
+    display: flex; align-items: center; gap: 6px;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 10px 14px; margin-bottom: 14px;
+  }
+  .dollar-sign { font-size: 28px; font-weight: 800; color: var(--text2); }
+  #income-input {
+    font-size: 28px; font-weight: 800; color: var(--green);
+    background: transparent; border: none; outline: none;
+    width: 100%; font-family: inherit;
+  }
+
+  /* Slider */
+  #income-slider {
+    -webkit-appearance: none; appearance: none;
+    width: 100%; height: 6px; border-radius: 3px; outline: none; cursor: pointer;
+    background: linear-gradient(to right, var(--green) 0%, var(--green) 12.5%, var(--border) 12.5%, var(--border) 100%);
+  }
+  #income-slider::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 22px; height: 22px;
+    border-radius: 50%; background: var(--green); cursor: pointer;
+    box-shadow: 0 0 0 4px rgba(63,185,80,0.2);
+  }
+  #income-slider::-moz-range-thumb {
+    width: 22px; height: 22px; border: none;
+    border-radius: 50%; background: var(--green); cursor: pointer;
+  }
+  .slider-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--text3); margin-top: 5px; }
+
+  /* Filing buttons */
+  .filing-btns { display: flex; gap: 8px; margin-top: 14px; }
+  .filing-btn {
+    flex: 1; padding: 10px 0; border-radius: 8px; cursor: pointer;
+    font-family: inherit; font-size: 13px; font-weight: 600;
+    border: 1.5px solid var(--border); background: transparent;
+    color: var(--text2); transition: all 0.15s;
+  }
+  .filing-btn.active {
+    border-color: var(--green);
+    background: rgba(63,185,80,0.1);
+    color: var(--green);
+  }
+
+  /* Donut charts */
+  .donut-wrap { display: flex; gap: 28px; align-items: center; flex-wrap: wrap; }
+  .donut-item { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .donut-container { position: relative; flex-shrink: 0; }
+  .donut-center {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+  }
+  .donut-center-val { font-size: 18px; font-weight: 800; color: var(--text); line-height: 1.1; }
+  .donut-center-sub { font-size: 11px; color: var(--text2); margin-top: 2px; }
+  .legend { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--text2); }
+  .legend-dot { width: 9px; height: 9px; border-radius: 2px; flex-shrink: 0; }
+
+  /* Horizontal bar chart */
+  .hbar-list { display: flex; flex-direction: column; gap: 12px; }
+  .hbar-row { }
+  .hbar-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 5px; }
+  .hbar-label-wrap { display: flex; align-items: center; gap: 8px; }
+  .hbar-track { height: 10px; background: var(--border2); border-radius: 5px; overflow: hidden; }
+  .hbar-fill { height: 100%; border-radius: 5px; transition: width 0.4s ease; }
+
+  /* Stacked bar */
+  .stacked-bar { display: flex; height: 52px; border-radius: 8px; overflow: hidden; gap: 2px; margin-bottom: 14px; }
+  .stacked-seg {
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700; color: #fff;
+    overflow: hidden; flex-shrink: 0; transition: width 0.4s ease;
+  }
+  .stacked-legend { display: flex; flex-wrap: wrap; gap: 7px 18px; }
+  .stacked-legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text2); }
+
+  /* Tables */
+  .bracket-section { margin-bottom: 28px; }
+  .bracket-header-row {
+    display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px;
+  }
+  .table-wrap { border-radius: 10px; overflow: hidden; border: 1px solid var(--border); }
+  .table-head {
+    display: grid;
+    grid-template-columns: 64px 1fr 1fr 90px 76px;
+    background: var(--surface2); padding: 10px 14px;
+    font-size: 11px; color: var(--text2); font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--border);
+  }
+  .table-head span { text-align: right; }
+  .table-head span:first-child { text-align: left; }
+  .table-row {
+    display: grid;
+    grid-template-columns: 64px 1fr 1fr 90px 76px;
+    padding: 11px 14px; align-items: center;
+    border-bottom: 1px solid var(--border2);
+  }
+  .table-row span { text-align: right; font-size: 13px; }
+  .table-row span:first-child { text-align: left; }
+  .rate-cell { display: flex; align-items: center; gap: 7px; }
+  .rate-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+  .rate-text { font-size: 14px; font-weight: 700; }
+  .bar-underline { height: 3px; background: var(--border2); margin-left: 14px; }
+  .bar-underline-fill { height: 100%; transition: width 0.4s ease; border-radius: 0 2px 2px 0; opacity: 0.75; }
+  .table-total {
+    display: grid;
+    grid-template-columns: 64px 1fr 1fr 90px 76px;
+    padding: 12px 14px; background: var(--surface2);
+    border-top: 2px solid var(--border); align-items: center;
+  }
+  .table-total span { text-align: right; font-size: 13px; font-weight: 600; color: var(--text); }
+  .table-total span:first-child { text-align: left; grid-column: 1/3; }
+
+  /* Payroll table */
+  .payroll-wrap { border-radius: 10px; overflow: hidden; border: 1px solid var(--border); }
+  .payroll-head {
+    display: grid; grid-template-columns: 1fr 90px 80px;
+    background: var(--surface2); padding: 10px 14px;
+    font-size: 11px; color: var(--text2); font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--border);
+  }
+  .payroll-head span:not(:first-child) { text-align: right; }
+  .payroll-row {
+    display: grid; grid-template-columns: 1fr 90px 80px;
+    padding: 12px 14px; align-items: center; gap: 10px;
+    border-bottom: 1px solid var(--border2);
+  }
+  .payroll-row .prow-label { display: flex; align-items: center; gap: 8px; }
+  .payroll-row .prow-detail { font-size: 12px; color: var(--text2); margin-top: 2px; padding-left: 16px; }
+  .rate-badge {
+    font-size: 12px; font-weight: 600; padding: 2px 8px;
+    border-radius: 20px; display: inline-block;
+  }
+  .payroll-amount { font-size: 15px; font-weight: 700; text-align: right; }
+  .payroll-pct { font-size: 12px; color: var(--text2); text-align: right; }
+
+  /* Footer */
+  .footnote {
+    font-size: 11px; color: var(--text3); text-align: center;
+    line-height: 1.8; border-top: 1px solid var(--border2); padding-top: 16px;
+  }
+
+  /* Responsive tweaks */
+  @media (max-width: 520px) {
+    .table-head, .table-row, .table-total {
+      grid-template-columns: 56px 1fr 1fr 80px 68px;
+      font-size: 11px;
+    }
+    .rate-text { font-size: 12px; }
+    .stat-card .stat-value { font-size: 20px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- HEADER -->
+  <div style="margin-bottom:24px">
+    <div class="label dimmed" style="margin-bottom:6px">2025 Tax Year · California</div>
+    <div style="font-size:28px;font-weight:800;letter-spacing:-0.5px">Income Tax Calculator</div>
+  </div>
+
+  <!-- INPUT CARD -->
+  <div class="card">
+    <div class="label" style="margin-bottom:10px">Gross Income</div>
+    <div class="income-input-wrap">
+      <span class="dollar-sign">$</span>
+      <input id="income-input" type="text" value="250,000" placeholder="0" autocomplete="off">
+    </div>
+    <input id="income-slider" type="range" min="0" max="2000000" step="5000" value="250000">
+    <div class="slider-labels">
+      <span>$0</span><span>$500k</span><span>$1M</span><span>$1.5M</span><span>$2M</span>
+    </div>
+    <div class="filing-btns">
+      <button class="filing-btn active" data-filing="single">Single</button>
+      <button class="filing-btn" data-filing="mfj">Married Filing Jointly</button>
+    </div>
+  </div>
+
+  <!-- STAT CARDS -->
+  <div class="stat-grid" id="stat-grid"></div>
+
+  <!-- DONUT CHARTS -->
+  <div class="card">
+    <div class="section-title">Tax Composition</div>
+    <div class="donut-wrap" id="donut-wrap"></div>
+  </div>
+
+  <!-- HORIZONTAL BAR -->
+  <div class="card">
+    <div class="section-title">Tax by Category</div>
+    <div class="hbar-list" id="hbar-list"></div>
+  </div>
+
+  <!-- STACKED BAR -->
+  <div class="card">
+    <div class="section-title">Every Dollar of <span id="gross-label">$250,000</span></div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:14px">How your income is divided</div>
+    <div class="stacked-bar" id="stacked-bar"></div>
+    <div class="stacked-legend" id="stacked-legend"></div>
+  </div>
+
+  <!-- FEDERAL BRACKETS -->
+  <div class="bracket-section" id="fed-bracket-section"></div>
+
+  <!-- CA BRACKETS -->
+  <div class="bracket-section" id="ca-bracket-section"></div>
+
+  <!-- PAYROLL -->
+  <div style="margin-bottom:28px">
+    <div class="section-title">Payroll Taxes</div>
+    <div class="payroll-wrap" id="payroll-wrap"></div>
+  </div>
+
+  <!-- FOOTNOTE -->
+  <div class="footnote">
+    2025 tax year · Federal brackets: IRS Rev. Proc. 2024-40 + OBBBA ·
+    CA brackets: 2025 FTB Tax Rate Schedules · SDI: EDD 1.2% (no cap) ·
+    W-2 ordinary income only · Excludes AMT, NIIT, credits, itemized deductions
+  </div>
+
+</div>
+
+<script>
+// ─── TAX DATA ───────────────────────────────────────────────────────────────
+const FED_STD = { single: 15750, mfj: 31500 };
+const CA_STD  = { single: 5706,  mfj: 11412 };
+
+const FED_BRACKETS = {
+  single: [
+    { rate: 0.10, top: 11925 },
+    { rate: 0.12, top: 48475 },
+    { rate: 0.22, top: 103350 },
+    { rate: 0.24, top: 197300 },
+    { rate: 0.32, top: 250525 },
+    { rate: 0.35, top: 626350 },
+    { rate: 0.37, top: Infinity },
+  ],
+  mfj: [
+    { rate: 0.10, top: 23850 },
+    { rate: 0.12, top: 96950 },
+    { rate: 0.22, top: 206700 },
+    { rate: 0.24, top: 394600 },
+    { rate: 0.32, top: 501050 },
+    { rate: 0.35, top: 751600 },
+    { rate: 0.37, top: Infinity },
+  ],
+};
+
+const CA_BRACKETS = {
+  single: [
+    { rate: 0.01,  top: 11079 },
+    { rate: 0.02,  top: 26264 },
+    { rate: 0.04,  top: 41452 },
+    { rate: 0.06,  top: 57542 },
+    { rate: 0.08,  top: 72724 },
+    { rate: 0.093, top: 371479 },
+    { rate: 0.103, top: 445771 },
+    { rate: 0.113, top: 742953 },
+    { rate: 0.123, top: Infinity },
+  ],
+  mfj: [
+    { rate: 0.01,  top: 22158 },
+    { rate: 0.02,  top: 52528 },
+    { rate: 0.04,  top: 82904 },
+    { rate: 0.06,  top: 115084 },
+    { rate: 0.08,  top: 145448 },
+    { rate: 0.093, top: 742958 },
+    { rate: 0.103, top: 891542 },
+    { rate: 0.113, top: 1485906 },
+    { rate: 0.123, top: Infinity },
+  ],
+};
+
+const SS_WAGE_BASE   = 176100;
+const SS_RATE        = 0.062;
+const MEDICARE_RATE  = 0.0145;
+const ADD_MED_RATE   = 0.009;
+const ADD_MED_THRESH = { single: 200000, mfj: 250000 };
+const SDI_RATE       = 0.012;
+
+const FED_COLORS = ["#3fb950","#56d364","#ffd060","#ffa657","#f0883e","#f85149","#c93c37"];
+const CA_COLORS  = ["#79c0ff","#58a6ff","#388bfd","#1f6feb","#1158c7","#0d419d","#0b3270","#082d62","#051d4d"];
+
+// ─── STATE ───────────────────────────────────────────────────────────────────
+let filing = "single";
+let gross  = 250000;
+
+// ─── HELPERS ─────────────────────────────────────────────────────────────────
+function calcBrackets(taxable, brackets) {
+  let prev = 0, tax = 0;
+  const slices = [];
+  for (const b of brackets) {
+    const chunk = Math.min(taxable, b.top) - prev;
+    if (chunk <= 0) break;
+    const t = chunk * b.rate;
+    slices.push({ rate: b.rate, income: chunk, tax: t, bracketMax: b.top, bracketMin: prev });
+    tax += t;
+    prev = b.top;
+    if (taxable <= b.top) break;
+  }
+  return { total: tax, slices };
+}
+
+const fmt = (n) => n === Infinity ? "No limit" : "$" + Math.round(n).toLocaleString();
+const fpct = (n, d) => d > 0 ? ((n / d) * 100).toFixed(1) + "%" : "—";
+const rateLabel = (r) => {
+  const v = r * 100;
+  return (v % 1 === 0 ? v.toFixed(0) : v.toFixed(1)) + "%";
+};
+
+function compute() {
+  const fedDed = FED_STD[filing];
+  const caDed  = CA_STD[filing];
+  const fedTaxable = Math.max(0, gross - fedDed);
+  const caTaxable  = Math.max(0, gross - caDed);
+  const { total: fedTotal, slices: fedSlices } = calcBrackets(fedTaxable, FED_BRACKETS[filing]);
+  const { total: caTotal,  slices: caSlices  } = calcBrackets(caTaxable,  CA_BRACKETS[filing]);
+  const ssTax      = Math.min(gross, SS_WAGE_BASE) * SS_RATE;
+  const medBase    = gross * MEDICARE_RATE;
+  const medAdd     = Math.max(0, gross - ADD_MED_THRESH[filing]) * ADD_MED_RATE;
+  const medicareTax = medBase + medAdd;
+  const sdiTax     = gross * SDI_RATE;
+  const grandTotal = fedTotal + caTotal + ssTax + medicareTax + sdiTax;
+  const afterTax   = gross - grandTotal;
+  const effectiveFed = gross > 0 ? fedTotal / gross * 100 : 0;
+  const effectiveCa  = gross > 0 ? caTotal  / gross * 100 : 0;
+  const effectiveAll = gross > 0 ? grandTotal / gross * 100 : 0;
+  const marginalFed  = fedSlices.length ? fedSlices[fedSlices.length-1].rate * 100 : 0;
+  return { fedDed, caDed, fedTaxable, caTaxable, fedTotal, caTotal, fedSlices, caSlices,
+           ssTax, medBase, medAdd, medicareTax, sdiTax, grandTotal, afterTax,
+           effectiveFed, effectiveCa, effectiveAll, marginalFed };
+}
+
+// ─── DONUT SVG ───────────────────────────────────────────────────────────────
+function buildDonutSVG(slices, size, thickness, centerVal, centerSub) {
+  const total = slices.reduce((s, x) => s + x.value, 0);
+  if (total <= 0) return '';
+  const cx = size/2, cy = size/2, r = (size - thickness) / 2;
+  const circ = 2 * Math.PI * r;
+  let circles = `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#30363d" stroke-width="${thickness}"/>`;
+  let offset = 0;
+  for (const s of slices) {
+    if (s.value <= 0) continue;
+    const dash = (s.value / total) * circ;
+    const gap  = circ - dash;
+    circles += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${s.color}"
+      stroke-width="${thickness}" stroke-dasharray="${dash} ${gap}"
+      stroke-dashoffset="${-offset}" stroke-linecap="butt"/>`;
+    offset += dash;
+  }
+  return `
+    <div class="donut-container" style="width:${size}px;height:${size}px">
+      <svg width="${size}" height="${size}" style="transform:rotate(-90deg)">${circles}</svg>
+      <div class="donut-center">
+        <div class="donut-center-val">${centerVal}</div>
+        <div class="donut-center-sub">${centerSub}</div>
+      </div>
+    </div>`;
+}
+
+// ─── RENDER ──────────────────────────────────────────────────────────────────
+function render() {
+  const d = compute();
+  updateSliderGradient();
+
+  // Stat cards
+  const stats = [
+    { label: "Total Taxes",        value: fmt(d.grandTotal), sub: `${d.effectiveAll.toFixed(1)}% all-in rate`,        color: "#f85149" },
+    { label: "Take-Home",          value: fmt(d.afterTax),   sub: `${(100-d.effectiveAll).toFixed(1)}% of gross`,     color: "#3fb950" },
+    { label: "Fed Effective Rate", value: `${d.effectiveFed.toFixed(1)}%`, sub: `Marginal: ${d.marginalFed.toFixed(0)}%`, color: "#f0883e" },
+    { label: "All-In Rate",        value: `${d.effectiveAll.toFixed(1)}%`, sub: "Fed + CA + Payroll",                  color: "#bc8cff" },
+  ];
+  document.getElementById("stat-grid").innerHTML = stats.map(s => `
+    <div class="stat-card" style="--accent:${s.color}">
+      <div class="label" style="margin-bottom:6px">${s.label}</div>
+      <div class="stat-value" style="color:${s.color}">${s.value}</div>
+      <div class="stat-sub">${s.sub}</div>
+    </div>`).join("");
+
+  // Donuts
+  const takeHomeSlices = [
+    { label: "Taxes",     value: d.grandTotal, color: "#f85149" },
+    { label: "Take-Home", value: d.afterTax,   color: "#3fb950" },
+  ].filter(s => s.value > 0);
+  const taxSlices = [
+    { label: "Federal",  value: d.fedTotal,    color: "#f0883e" },
+    { label: "CA",       value: d.caTotal,     color: "#58a6ff" },
+    { label: "SS",       value: d.ssTax,       color: "#bc8cff" },
+    { label: "Medicare", value: d.medicareTax, color: "#e78bff" },
+    { label: "SDI",      value: d.sdiTax,      color: "#ff7eb3" },
+  ].filter(s => s.value > 0);
+
+  document.getElementById("donut-wrap").innerHTML = `
+    <div class="donut-item">
+      ${buildDonutSVG(takeHomeSlices, 150, 26, fpct(d.grandTotal, gross), "total tax")}
+      <div class="legend">${takeHomeSlices.map(s =>
+        `<div class="legend-item"><div class="legend-dot" style="background:${s.color}"></div>${s.label}</div>`).join("")}</div>
+    </div>
+    <div class="donut-item">
+      ${buildDonutSVG(taxSlices, 150, 26, fmt(d.grandTotal), "in taxes")}
+      <div class="legend">${taxSlices.map(s =>
+        `<div class="legend-item"><div class="legend-dot" style="background:${s.color}"></div>${s.label}</div>`).join("")}</div>
+    </div>`;
+
+  // H-bar chart
+  const hbarItems = [
+    { label: "Federal Income Tax",  value: d.fedTotal,    color: "#f0883e", pct: d.effectiveFed },
+    { label: "CA State Income Tax", value: d.caTotal,     color: "#58a6ff", pct: d.effectiveCa },
+    { label: "Social Security",     value: d.ssTax,       color: "#bc8cff", pct: d.ssTax/gross*100 },
+    { label: "Medicare (all)",      value: d.medicareTax, color: "#e78bff", pct: d.medicareTax/gross*100 },
+    { label: "CA SDI",              value: d.sdiTax,      color: "#ff7eb3", pct: d.sdiTax/gross*100 },
+  ];
+  const maxHbar = Math.max(...hbarItems.map(x => x.value), 1);
+  document.getElementById("hbar-list").innerHTML = hbarItems.map(item => {
+    const pct = gross > 0 ? (item.value / maxHbar) * 100 : 0;
+    return `
+    <div class="hbar-row">
+      <div class="hbar-header">
+        <div class="hbar-label-wrap">
+          <div class="legend-dot" style="background:${item.color}"></div>
+          <span style="font-size:13px;font-weight:500;color:var(--text)">${item.label}</span>
+        </div>
+        <div style="text-align:right">
+          <span style="font-size:14px;font-weight:700;color:${item.color}">${fmt(item.value)}</span>
+          <span style="font-size:11px;color:var(--text2);margin-left:6px">${item.pct.toFixed(1)}%</span>
+        </div>
+      </div>
+      <div class="hbar-track">
+        <div class="hbar-fill" style="width:${pct}%;background:${item.color}"></div>
+      </div>
+    </div>`;
+  }).join("");
+
+  // Stacked bar
+  document.getElementById("gross-label").textContent = fmt(gross);
+  const stackSegs = [
+    { label: "Federal", value: d.fedTotal,    color: "#f0883e" },
+    { label: "CA Tax",  value: d.caTotal,     color: "#58a6ff" },
+    { label: "SS",      value: d.ssTax,       color: "#bc8cff" },
+    { label: "Medicare",value: d.medicareTax, color: "#e78bff" },
+    { label: "SDI",     value: d.sdiTax,      color: "#ff7eb3" },
+    { label: "Take-Home",value: d.afterTax,   color: "#238636" },
+  ];
+  document.getElementById("stacked-bar").innerHTML = gross > 0
+    ? stackSegs.map(s => {
+        const w = (s.value / gross) * 100;
+        if (w < 0.2) return "";
+        return `<div class="stacked-seg" style="width:${w}%;background:${s.color}" title="${s.label}: ${fmt(s.value)}">
+          ${w > 6 ? s.label : ""}
+        </div>`;
+      }).join("")
+    : "";
+  document.getElementById("stacked-legend").innerHTML = stackSegs.map(s =>
+    `<div class="stacked-legend-item">
+      <div class="legend-dot" style="background:${s.color}"></div>
+      ${s.label} <strong style="color:var(--text)">${fmt(s.value)}</strong>
+      <span class="dimmed">(${fpct(s.value, gross)})</span>
+    </div>`).join("");
+
+  // Federal bracket table
+  renderBracketTable("fed-bracket-section", "Federal Income Tax Brackets",
+    "#f0883e", d.fedDed, d.fedTaxable, d.fedSlices, d.fedTotal, FED_COLORS);
+
+  // CA bracket table
+  renderBracketTable("ca-bracket-section", "California Income Tax Brackets",
+    "#58a6ff", d.caDed, d.caTaxable, d.caSlices, d.caTotal, CA_COLORS);
+
+  // Payroll
+  const payrollRows = [
+    { label: "Social Security", rate: "6.2%",  detail: `On first ${fmt(SS_WAGE_BASE)}`,                        value: d.ssTax,    color: "#bc8cff" },
+    { label: "Medicare (base)", rate: "1.45%", detail: "No wage cap",                                           value: d.medBase,  color: "#e78bff" },
+    ...(d.medAdd > 0 ? [{ label: "Add'l Medicare", rate: "0.9%",
+      detail: `Wages over ${fmt(ADD_MED_THRESH[filing])}`, value: d.medAdd, color: "#d946ef" }] : []),
+    { label: "CA SDI",          rate: "1.2%",  detail: "All wages, no cap",                                     value: d.sdiTax,   color: "#ff7eb3" },
+  ];
+  document.getElementById("payroll-wrap").innerHTML =
+    `<div class="payroll-head"><span>Tax</span><span>Amount</span><span>% of Gross</span></div>` +
+    payrollRows.map((row, i) => `
+    <div class="payroll-row" style="background:${i%2===0?'var(--bg)':'var(--surface)'}">
+      <div>
+        <div class="prow-label">
+          <div class="legend-dot" style="background:${row.color}"></div>
+          <span style="font-size:14px;font-weight:600;color:var(--text)">${row.label}</span>
+          <span class="rate-badge" style="color:${row.color};background:${row.color}25">${row.rate}</span>
+        </div>
+        <div class="prow-detail">${row.detail}</div>
+      </div>
+      <div class="payroll-amount" style="color:${row.color}">${fmt(row.value)}</div>
+      <div class="payroll-pct">${fpct(row.value, gross)}</div>
+    </div>`).join("");
+}
+
+function renderBracketTable(elId, title, accentColor, deduction, taxable, slices, total, colors) {
+  const el = document.getElementById(elId);
+  const rows = slices.map((s, i) => {
+    const color = colors[i] || accentColor;
+    const barPct = total > 0 ? (s.tax / total) * 100 : 0;
+    const maxLabel = s.bracketMax === Infinity ? "No limit" : fmt(s.bracketMax);
+    const bg = i % 2 === 0 ? "var(--bg)" : "var(--surface)";
+    return `
+    <div class="table-row" style="background:${bg}">
+      <div class="rate-cell">
+        <div class="rate-dot" style="background:${color}"></div>
+        <span class="rate-text" style="color:${color}">${rateLabel(s.rate)}</span>
+      </div>
+      <span style="color:var(--text2);font-style:${s.bracketMax===Infinity?'italic':'normal'}">${maxLabel}</span>
+      <span style="color:var(--text);font-weight:600">${fmt(s.income)}</span>
+      <span style="color:${color};font-weight:700">${fmt(s.tax)}</span>
+      <span style="color:var(--text2)">${fpct(s.tax, total)}</span>
+    </div>
+    <div class="bar-underline"><div class="bar-underline-fill" style="width:${barPct}%;background:${color}"></div></div>`;
+  }).join("");
+
+  el.innerHTML = `
+    <div class="bracket-header-row">
+      <div class="section-title" style="margin-bottom:0">${title}</div>
+      <div style="font-size:12px;color:var(--text2)">Taxable: <strong style="color:${accentColor}">${fmt(taxable)}</strong></div>
+    </div>
+    <div class="table-wrap">
+      <div class="table-head">
+        <span>Rate</span>
+        <span>Bracket Max</span>
+        <span>Income Taxed</span>
+        <span>Tax Owed</span>
+        <span>% of Tax</span>
+      </div>
+      <div class="table-row" style="background:var(--surface)">
+        <div class="rate-cell">
+          <div class="rate-dot" style="background:#484f58"></div>
+          <span style="font-size:13px;color:var(--text2)">Ded.</span>
+        </div>
+        <span style="color:var(--text3)">—</span>
+        <span style="color:var(--text);font-weight:500">${fmt(deduction)}</span>
+        <span style="color:var(--text3)">—</span>
+        <span style="color:var(--text3)">—</span>
+      </div>
+      ${rows}
+      <div class="table-total">
+        <span>Total</span>
+        <span>${fmt(taxable)}</span>
+        <span style="font-size:15px;color:${accentColor};font-weight:800">${fmt(total)}</span>
+        <span style="color:${accentColor}">${fpct(total, gross)}</span>
+      </div>
+    </div>`;
+}
+
+function updateSliderGradient() {
+  const pct = (gross / 2000000) * 100;
+  document.getElementById("income-slider").style.background =
+    `linear-gradient(to right, #3fb950 0%, #3fb950 ${pct}%, #30363d ${pct}%, #30363d 100%)`;
+}
+
+// ─── EVENT LISTENERS ─────────────────────────────────────────────────────────
+document.getElementById("income-input").addEventListener("input", (e) => {
+  const raw = e.target.value.replace(/[^0-9]/g, "");
+  const n = parseInt(raw);
+  if (!isNaN(n) && n >= 0) {
+    gross = Math.min(n, 2000000);
+    document.getElementById("income-slider").value = gross;
+    e.target.value = n.toLocaleString();
+  } else if (raw === "") {
+    gross = 0;
+  }
+  render();
+});
+
+// Reformat on blur
+document.getElementById("income-input").addEventListener("blur", (e) => {
+  if (gross > 0) e.target.value = gross.toLocaleString();
+});
+
+document.getElementById("income-slider").addEventListener("input", (e) => {
+  gross = parseInt(e.target.value);
+  document.getElementById("income-input").value = gross.toLocaleString();
+  render();
+});
+
+document.querySelectorAll(".filing-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    filing = btn.dataset.filing;
+    document.querySelectorAll(".filing-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    render();
+  });
+});
+
+// Initial render
+render();
+</script>
+</body>
+</html>
