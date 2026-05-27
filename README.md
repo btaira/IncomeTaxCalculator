@@ -23,6 +23,10 @@ This calculator helps you understand your federal income tax obligations by show
 - Effective tax rate
 - Visual breakdown of tax calculations
 
+## Screenshot
+
+![Tax Calculator Screenshot](images/calculator-screenshot.png)
+
 ## Usage
 
 ### Online
